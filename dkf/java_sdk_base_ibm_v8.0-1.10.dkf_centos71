@@ -1,0 +1,23 @@
+FROM centos:7
+# Bring down the latest centos V7 version
+
+MAINTAINER Rob Fish <robfish3@googlemail.com
+
+ENV JAVA_DISTRIB  ibm
+ENV JAVA_ARCH    x86_64
+ENV JAVA_TYPE    sdk
+ENV JAVA_VERSION 8.0-1.10
+
+ADD tars/${JAVA_DISTRIB}-java-${JAVA_ARCH}-${JAVA_TYPE}-${JAVA_VERSION}*        /tmp/work/
+ADD configfiles/java/${JAVA_DISTRIB}/jre/installer.properties  /tmp/work/
+
+RUN  cd /tmp/work                     && \
+  chmod +x ${JAVA_DISTRIB}-java-${JAVA_ARCH}-${JAVA_TYPE}-${JAVA_VERSION}*  && \
+  ./${JAVA_DISTRIB}-java-${JAVA_ARCH}-${JAVA_TYPE}-${JAVA_VERSION}* -i silent -f installer.properties && \
+  update-alternatives --install /usr/bin/java java /opt/ibm/java/jre/bin/java 1 && \
+  rm -rf /opt/ibm/java/_uninstall       && \
+  rm -rf /opt/ibm/java/docs             && \
+  rm -rf /tmp/work
+
+ENV JAVA_HOME /opt/ibm/java/jre
+ENV PATH=$JAVA_HOME/bin:$PATH
